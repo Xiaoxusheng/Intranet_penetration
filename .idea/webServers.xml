@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="67ef2e16-a989-4108-8a4e-8f751060694c" name="Intranet_penetration">
+        <fileTransfer rootFolder="/root" accessType="SFTP" host="192.168.0.107" port="22" sshConfigId="762b24fa-327e-4458-a178-243ffd0ca08b" sshConfig="root@192.168.0.107:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
