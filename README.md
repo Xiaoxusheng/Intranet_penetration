@@ -124,3 +124,76 @@ func main() {
 }
 ```
 
+
+
+#### 5. 流量实时查看
+
+提供了流量实时查看功能
+
+```go
+type Reader struct {
+	io.Reader
+	io.Writer
+	Size int64
+}
+
+func (r *Reader) Read(p []byte) (n int, err error) {
+	n, err = r.Reader.Read(p)
+	if err != nil {
+		return 0, err
+	}
+	atomic.AddInt64(&r.Size, int64(n))
+	r.log(r.Size)
+	return n, err
+}
+
+func (r *Reader) Write(p []byte) (n int, err error) {
+	n, err = r.Writer.Write(p)
+	if err != nil {
+		return 0, err
+	}
+	return n, err
+}
+
+func (r *Reader) log(rd int64) {
+	switch {
+	case rd <= (1024*1024)/2:
+		log.Printf("转发流量为：%vM", rd/(1024*1024)/2)
+	case (1024*1024)/2 < rd && rd <= 1024*((1024*1024)/2):
+		log.Printf("转发流量为：%vG %vM", int(rd/(1024*1024)/2/1024), rd/(1024*1024)/2%1024)
+	}
+}
+```
+
+在service.go文件中,当进行数据交换时，就会调用底层Read()方法
+
+```go
+func tunnelService() {
+	con := utility.CreateLister(utility.TunnelPort)
+	log.Printf("[隧道启动监听]%v", con.Addr().String())
+
+	for {
+		tunnelConn, err := con.AcceptTCP()
+		if err != nil {
+			log.Println(err)
+		}
+		r := &utility.Reader{
+			Reader: tunnelConn,
+			Writer: tunnelConn,
+		}
+		//流量限制,关闭隧道
+		go r.Limit(utility.FlowRate, controlCon)
+		go io.Copy(useConn, r)
+		go io.Copy(r, useConn)
+
+	}
+}
+```
+
+效果
+
+![](utility/img_2.png)
+
+
+
+
