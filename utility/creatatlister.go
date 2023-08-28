@@ -1,10 +1,12 @@
 package utility
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"sync/atomic"
+	"time"
 )
 
 const (
@@ -13,6 +15,11 @@ const (
 	TunnelPort      = ":8082"
 	Localhost       = ":80"
 	SendMessage     = "A New Request Join!\n"
+)
+
+var (
+	FlowRate  int64 = 220 //M为单位，超过就会主动断开客户端连接
+	StartChan       = make(chan bool, 10)
 )
 
 type Reader struct {
@@ -46,6 +53,24 @@ func (r *Reader) log(rd int64) {
 	case (1024*1024)/2 < rd && rd <= 1024*((1024*1024)/2):
 		log.Printf("转发流量为：%vG %vM", int(rd/(1024*1024)/2/1024), rd/(1024*1024)/2%1024)
 	}
+}
+
+func (r *Reader) Limit(n int64, net *net.TCPConn) {
+	fmt.Println("Limit启动", r.Size/(1024*1024), n)
+	for {
+		fmt.Println("已经使用流量数：", r.Size/(1024*1024)/2)
+		time.Sleep(time.Second * 3)
+		if r.Size/(1024*1024)/2 > n {
+			_, err := net.Write([]byte("您已达到流量上限！\n"))
+			if err != nil {
+				log.Println("写入出错!" + err.Error())
+			}
+			//主动关闭连接
+			net.Close()
+			break
+		}
+	}
+
 }
 
 // 创建监听

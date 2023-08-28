@@ -1,19 +1,19 @@
 package main
 
 import (
-	`Intranet_penetration/utility`
-	`fmt`
-	`io`
-	`log`
-	`net`
-	`sync`
+	"Intranet_penetration/utility"
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"sync"
 )
 
 var useConn *net.TCPConn
 var controlCon *net.TCPConn
 var err error
 
-//服务器 放置在公网上
+// 服务器 放置在公网上
 func controlService() {
 	con := utility.CreateLister(utility.ControlPort)
 	log.Printf("[控制启动监听]%v", con.Addr().String())
@@ -57,11 +57,16 @@ func userRequestService() {
 		if err != nil {
 			log.Println(err)
 		}
-		//fmt.Println("controlCon", controlCon)
+		fmt.Println("controlCon", controlCon)
+		//controlCon只有有客户端连接才会生成，所有需要等待一下
+		if controlCon == nil {
+			continue
+		}
 		//防止controlCon还没有启动造成空指针问题
 		_, err = controlCon.Write([]byte(utility.SendMessage))
 		if err != nil {
-			log.Println("发送出错！")
+			log.Println("发送出错！" + err.Error())
+			controlCon.Close()
 		}
 		fmt.Println("发送成功")
 	}
@@ -81,9 +86,11 @@ func tunnelService() {
 			Reader: tunnelConn,
 			Writer: tunnelConn,
 		}
-
+		//流量限制,关闭隧道
+		go r.Limit(utility.FlowRate, controlCon)
 		go io.Copy(useConn, r)
 		go io.Copy(r, useConn)
+
 	}
 }
 
