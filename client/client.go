@@ -1,13 +1,13 @@
 package main
 
 import (
-	`Intranet_penetration/utility`
-	`bufio`
-	`io`
-	`log`
+	"Intranet_penetration/utility"
+	"bufio"
+	"io"
+	"log"
 )
 
-//连接控制端
+// 连接控制端
 func controlsClient() {
 	//连接控制端
 	tCPConn := utility.CreateConn(utility.ControlPort)
@@ -34,11 +34,11 @@ func controlsClient() {
 	}
 }
 
-//连接隧道
+// 连接隧道
 func getMessage() {
-	//隧道
+	//连接隧道
 	conn := utility.CreateConn(utility.TunnelPort)
-	//本地服务器
+	//连接本地服务器
 	localhost := utility.CreateConn(utility.Localhost)
 
 	r := &utility.Reader{
