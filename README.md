@@ -30,10 +30,8 @@ const (
 
 出现
 
-![image-20230828131325169](C:\Users\雷龙\AppData\Roaming\Typora\typora-user-images\image-20230828131325169.png)
-
-![image-20230828131516172](C:\Users\雷龙\AppData\Roaming\Typora\typora-user-images\image-20230828131516172.png)
-
+![](utility/img.png)
+![](utility/img_1.png)
 说明都已经启动成功
 
 #### 3. linux上使用
