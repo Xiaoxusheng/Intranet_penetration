@@ -30,7 +30,8 @@ func controlService() {
 			log.Println("解析读取错误" + err.Error())
 			continue
 		}
-		fmt.Println("string(data):", string(data), len(data), string(data) == "hello,wrold", len("hello,wrold"))
+		//fmt.Println("string(data):", string(data), len(data), string(data) == "hello,wrold", len("hello,wrold"))
+		fmt.Println("有客户端连接服务")
 		if string(data) != "hello,wrold" {
 			err := controlCon.Close()
 			if err != nil {
@@ -39,7 +40,6 @@ func controlService() {
 			continue
 		}
 		//保活
-
 		err = controlCon.SetKeepAlive(true)
 		if err != nil {
 			log.Println("保活失败" + err.Error())
@@ -51,7 +51,7 @@ func controlService() {
 
 func userRequestService() {
 	Con := utility.CreateLister(utility.UserRequestPort)
-	log.Printf("[用户请求监听] %v\n", Con.Addr().String())
+	log.Printf("[用户请求监听]%v", Con.Addr().String())
 	for {
 		useConn, err = Con.AcceptTCP()
 		if err != nil {
@@ -98,6 +98,8 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	//控制端，控制连接
+	fmt.Println("请输入可用流量大小,单位为m")
+	fmt.Scanln(&utility.FlowRate)
 	go controlService()
 	//用户请求端
 	go userRequestService()
@@ -105,42 +107,4 @@ func main() {
 	go tunnelService()
 
 	wg.Wait()
-
-	//addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:80")
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//tcp, err := net.ListenTCP("tcp", addr)
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//fmt.Println(tcp.Addr())
-	//
-	//log.Println("服务端启动!")
-	//for {
-	//	//data := make([]byte, 1024)
-	//	acceptTCP, err := tcp.AcceptTCP()
-	//	if err != nil {
-	//		log.Println(err)
-	//	}
-	//
-	//	_, err = acceptTCP.Write([]byte("go is good"))
-	//	if err != nil {
-	//		log.Println(err)
-	//	}
-	//	for {
-	//		readString, err := bufio.NewReader(acceptTCP).ReadString('\n')
-	//		if err != nil {
-	//			log.Println(err)
-	//		}
-	//		fmt.Println("读到的数据", readString)
-	//		fmt.Println("阻塞...")
-	//
-	//	}
-	//
-	//	//_, err = acceptTCP.Read(readString)
-	//	//if err != nil {
-	//	//	log.Println(err)
-	//	//}
-	//}
 }

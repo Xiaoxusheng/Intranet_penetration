@@ -131,10 +131,15 @@ func main() {
 提供了流量实时查看功能
 
 ```go
+var (
+	FlowRate int64 = 220 //M为单位，超过就会主动断开客户端连接
+	size     int64
+	k        bool = false
+)
+
 type Reader struct {
 	io.Reader
 	io.Writer
-	Size int64
 }
 
 func (r *Reader) Read(p []byte) (n int, err error) {
@@ -142,8 +147,8 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 	if err != nil {
 		return 0, err
 	}
-	atomic.AddInt64(&r.Size, int64(n))
-	r.log(r.Size)
+	atomic.AddInt64(&size, int64(n))
+	r.log(size)
 	return n, err
 }
 
@@ -157,11 +162,33 @@ func (r *Reader) Write(p []byte) (n int, err error) {
 
 func (r *Reader) log(rd int64) {
 	switch {
-	case rd <= (1024*1024)/2:
-		log.Printf("转发流量为：%vM", rd/(1024*1024)/2)
-	case (1024*1024)/2 < rd && rd <= 1024*((1024*1024)/2):
+	case rd > 1024*((1024*1024)/2):
 		log.Printf("转发流量为：%vG %vM", int(rd/(1024*1024)/2/1024), rd/(1024*1024)/2%1024)
+	case rd > (1024*1024)/2:
+		log.Printf("转发流量为：%vM", rd/(1024*1024)/2)
 	}
+}
+
+func (r *Reader) Limit(n int64, net *net.TCPConn) {
+	fmt.Println("Limit启动", size/(1024*1024), n)
+	for {
+
+		if size/(1024*1024)/2 > n {
+			_, err := net.Write([]byte("您已达到流量上限！\n"))
+			if err != nil {
+				log.Println("写入出错!" + err.Error())
+			}
+			//主动关闭连接
+			net.Close()
+			k = true
+		}
+		if k {
+			return
+		}
+		time.Sleep(time.Second * 3)
+		fmt.Println("已经使用流量数：", size/(1024*1024)/2)
+	}
+
 }
 ```
 

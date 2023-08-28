@@ -18,6 +18,14 @@ func main() {
 		defer file.Close()
 		io.Copy(w, file)
 	})
+	http.HandleFunc("/i", func(w http.ResponseWriter, _ *http.Request) {
+		file, err := os.Open("1.mp4")
+		if err != nil {
+			log.Println("打开失败" + err.Error())
+		}
+		defer file.Close()
+		io.Copy(w, file)
+	})
 	http.ListenAndServe(utility.Localhost, nil)
 
 }
