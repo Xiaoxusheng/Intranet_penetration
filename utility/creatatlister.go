@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	ControlPort     = ":8080"
-	UserRequestPort = ":8081"
-	TunnelPort      = ":8082"
-	Localhost       = ":80"
+	ControlPort     = "127.0.0.1:8080"
+	UserRequestPort = "127.0.0.1:8081"
+	TunnelPort      = "127.0.0.1:8082"
+	Localhost       = "127.0.0.1:80"
 	SendMessage     = "A New Request Join!\n"
 )
 

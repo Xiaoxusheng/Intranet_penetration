@@ -16,7 +16,10 @@ func main() {
 			log.Println("打开失败" + err.Error())
 		}
 		defer file.Close()
-		io.Copy(w, file)
+		_, err = io.Copy(w, file)
+		if err != nil {
+			log.Println(err)
+		}
 	})
 	http.HandleFunc("/i", func(w http.ResponseWriter, _ *http.Request) {
 		file, err := os.Open("1.mp4")
