@@ -217,6 +217,28 @@ func tunnelService() {
 }
 ```
 
+#### 6.配置client
+```go
+var ControlPort string
+var TunnelPort string
+var Localhost string
+
+func init() {
+	flag.StringVar(&ControlPort, "ControlPort", utility.ControlPort, "控制端地址：")
+	flag.StringVar(&TunnelPort, "TunnelPort", utility.TunnelPort, "隧道地址：")
+	flag.StringVar(&Localhost, "Localhost", utility.Localhost, "本地地址：")
+	flag.Parse()
+	log.Printf("控制端地址:%v \n 隧道地址:%v \n 本地地址:%v  ", ControlPort, TunnelPort, Localhost)
+}
+```
+
+```txt
+go build -o -ControlPort 127.0.0.1:8080 -TunnelPort 127.0.0.1:8081 -Localhost 127.0.0.1:80
+为ControlPort地址 TunnelPort地址 Localhost地址
+```
+
+
+
 效果
 
 ![](utility/img_2.png)

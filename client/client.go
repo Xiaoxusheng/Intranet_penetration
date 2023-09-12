@@ -3,14 +3,27 @@ package main
 import (
 	"Intranet_penetration/utility"
 	"bufio"
+	"flag"
 	"io"
 	"log"
 )
 
+var ControlPort string
+var TunnelPort string
+var Localhost string
+
+func init() {
+	flag.StringVar(&ControlPort, "ControlPort", utility.ControlPort, "控制端地址：")
+	flag.StringVar(&TunnelPort, "TunnelPort", utility.TunnelPort, "隧道地址：")
+	flag.StringVar(&Localhost, "Localhost", utility.Localhost, "本地地址：")
+	flag.Parse()
+	log.Printf("控制端地址:%v \n 隧道地址:%v \n 本地地址:%v  ", ControlPort, TunnelPort, Localhost)
+}
+
 // 连接控制端
 func controlsClient() {
 	//连接控制端
-	tCPConn := utility.CreateConn(utility.ControlPort)
+	tCPConn := utility.CreateConn(ControlPort)
 	//验证身份
 	_, err := tCPConn.Write([]byte("hello,wrold"))
 	if err != nil {
@@ -37,7 +50,7 @@ func controlsClient() {
 // 连接隧道
 func getMessage() {
 	//连接隧道
-	conn := utility.CreateConn(utility.TunnelPort)
+	conn := utility.CreateConn(TunnelPort)
 	//连接本地服务器
 	localhost := utility.CreateConn(utility.Localhost)
 

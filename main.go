@@ -1,7 +1,6 @@
 package main
 
 import (
-	"Intranet_penetration/utility"
 	"io"
 	"log"
 	"net/http"
@@ -26,6 +25,14 @@ func main() {
 		defer file.Close()
 		io.Copy(w, file)
 	})
-	http.ListenAndServe(utility.Localhost, nil)
+	err := http.ListenAndServe(":80", nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	//err := http.ListenAndServeTLS(":8082", "../ssl/xlei.love.pem", "../ssl/xlei.love.key", nil)
+	//if err != nil {
+	//	log.Println(err)
+	//}
 
 }

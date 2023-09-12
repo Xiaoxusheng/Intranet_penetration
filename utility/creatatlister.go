@@ -96,7 +96,7 @@ func CreateLister(addrs string) *net.TCPListener {
 func CreateConn(addrs string) *net.TCPConn {
 	addr, err := net.ResolveTCPAddr("tcp", addrs)
 	if err != nil {
-		log.Println("客户", err)
+		log.Println("客户端创建失败", err)
 	}
 	tcp, err := net.DialTCP("tcp", nil, addr)
 	if err != nil {
@@ -105,13 +105,13 @@ func CreateConn(addrs string) *net.TCPConn {
 	return tcp
 }
 
-//func KeepAlive(tcp *net.TCPConn) {
-//	for {
-//		_, err := tcp.Write([]byte("hello,world!\n"))
-//		if err != nil {
-//			log.Println(err)
-//			continue
-//		}
-//		time.Sleep(time.Second * 5)
-//	}
-//}
+func KeepAlive(tcp *net.TCPConn) {
+	for {
+		_, err := tcp.Write([]byte("hello,world!\n"))
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		time.Sleep(time.Second * 5)
+	}
+}

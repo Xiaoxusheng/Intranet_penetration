@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"time"
 )
 
 var useConn *net.TCPConn
@@ -45,7 +46,13 @@ func controlService() {
 			log.Println("保活失败" + err.Error())
 			continue
 		}
-		//go utility.KeepAlive(controlCon)
+		// 设置keep-alive的间隔时间
+		err = controlCon.SetKeepAlivePeriod(30 * time.Second)
+		if err != nil {
+			log.Println("设置失败" + err.Error())
+
+		}
+		go utility.KeepAlive(controlCon)
 	}
 }
 
